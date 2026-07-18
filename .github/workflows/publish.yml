@@ -46,7 +46,7 @@ jobs:
       - name: Build registry
         env:
           PAGES_URL: ${{ steps.pages.outputs.base_url }}
-        run: npx tsx app/scripts/build-registry.ts "$GITHUB_WORKSPACE/packs" "$GITHUB_WORKSPACE/dist" --base-url "$PAGES_URL"
+        run: npx tsx scripts/build-registry.ts "$GITHUB_WORKSPACE/packs" "$GITHUB_WORKSPACE/dist" --base-url "$PAGES_URL"
         working-directory: app
       - name: Validate published index against exported schema
         run: npx --yes ajv-cli validate -s app/schemas/registry.schema.json -d dist/registry.json
