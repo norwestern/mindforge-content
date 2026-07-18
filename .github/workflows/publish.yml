@@ -1,0 +1,56 @@
+name: publish
+on:
+  push: { branches: [main] }
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: norwestern/mindforge
+          ref: registry-v1
+          token: ${{ secrets.APP_REPO_TOKEN }}
+          path: app
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: npm ci
+        working-directory: app
+      - name: Resolve Pages URL
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Carry forward published archives
+        env:
+          PAGES_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          mkdir -p dist
+          if curl -fsSL "$PAGES_URL/registry.json" -o dist/registry.json; then
+            for url in $(jq -r '.packs[].versions[].url' dist/registry.json); do
+              curl -fsSL "$url" -o "dist/$(basename "$url")"
+            done
+          else
+            echo "no previous registry (first publish)"
+            rm -f dist/registry.json
+          fi
+      - name: Build registry
+        env:
+          PAGES_URL: ${{ steps.pages.outputs.base_url }}
+        run: npx tsx app/scripts/build-registry.ts "$GITHUB_WORKSPACE/packs" "$GITHUB_WORKSPACE/dist" --base-url "$PAGES_URL"
+        working-directory: app
+      - name: Validate published index against exported schema
+        run: npx --yes ajv-cli validate -s app/schemas/registry.schema.json -d dist/registry.json
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: dist }
+      - id: deployment
+        uses: actions/deploy-pages@v4

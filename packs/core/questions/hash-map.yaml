@@ -1,0 +1,25 @@
+conceptId: hash-map
+questions:
+  - type: mcq
+    id: hash-map-q1
+    conceptId: hash-map
+    difficulty: 1
+    prompt: "What is the average time complexity of a hash map lookup?"
+    options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
+    answerIndex: 0
+    pitfall: "Believing hash map lookup is O(n) like an array scan."
+  - type: fill-in
+    id: hash-map-q2
+    conceptId: hash-map
+    difficulty: 2
+    prompt: "When two different keys hash to the same index, this is called a ____."
+    answer: "collision"
+    acceptable: ["collisions", "hash collision"]
+    pitfall: "Not knowing the name for two keys mapping to the same index."
+  - type: trace
+    id: hash-map-q3
+    conceptId: hash-map
+    difficulty: 2
+    prompt: "Given an empty map m, after m['a']=1; m['b']=2; m['a']=3, what does m['a'] return?"
+    answer: "3"
+    pitfall: "Forgetting that writing an existing key overwrites rather than appends."

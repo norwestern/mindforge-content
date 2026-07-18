@@ -1,0 +1,8 @@
+{
+  "contractVersion": 1,
+  "description": "Core concepts: arrays, hash maps, two pointers.",
+  "namespace": "core",
+  "requires": {},
+  "title": "Programming Fundamentals",
+  "version": "1.0.0"
+}

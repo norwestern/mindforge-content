@@ -1,0 +1,25 @@
+conceptId: arrays
+questions:
+  - type: mcq
+    id: arrays-q1
+    conceptId: arrays
+    difficulty: 1
+    prompt: "What is the time complexity of accessing an array element by index?"
+    options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
+    answerIndex: 0
+    pitfall: "Thinking indexed access requires scanning, like a linked list."
+  - type: fill-in
+    id: arrays-q2
+    conceptId: arrays
+    difficulty: 3
+    prompt: "Inserting at the front of an array of size n requires shifting up to ____ elements."
+    answer: "n"
+    acceptable: ["n elements"]
+    pitfall: "Forgetting that insertion at the front is O(n), not O(1)."
+  - type: trace
+    id: arrays-q3
+    conceptId: arrays
+    difficulty: 2
+    prompt: "Given an empty array, push 5, then 8, then 3. What is arr[2]?"
+    answer: "3"
+    pitfall: "Confusing insertion order with sorted order — arrays don't auto-sort."
