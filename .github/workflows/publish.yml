@@ -49,7 +49,7 @@ jobs:
         run: npx tsx scripts/build-registry.ts "$GITHUB_WORKSPACE/packs" "$GITHUB_WORKSPACE/dist" --base-url "$PAGES_URL"
         working-directory: app
       - name: Validate published index against exported schema
-        run: npx --yes ajv-cli validate -s app/schemas/registry.schema.json -d dist/registry.json
+        run: npx --yes -p ajv-cli -p ajv-formats ajv validate --spec=draft2020 -c ajv-formats -s app/schemas/registry.schema.json -d dist/registry.json
       - uses: actions/upload-pages-artifact@v3
         with: { path: dist }
       - id: deployment
