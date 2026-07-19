@@ -8,6 +8,10 @@ questions:
     options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
     answerIndex: 0
     pitfall: "Believing hash map lookup is O(n) like an array scan."
+    hints:
+      - "Think about what the hash function lets you skip."
+      - "It's about going straight to a location rather than scanning."
+      - "Same complexity class as array index access under normal conditions."
   - type: fill-in
     id: hash-map-q2
     conceptId: hash-map
@@ -16,6 +20,10 @@ questions:
     answer: "collision"
     acceptable: ["collisions", "hash collision"]
     pitfall: "Not knowing the name for two keys mapping to the same index."
+    hints:
+      - "This is the word for when two different keys land in the same spot."
+      - "It's named directly in 'the catch' section of the lesson."
+      - "It starts with 'coll-' and describes two things running into each other."
   - type: trace
     id: hash-map-q3
     conceptId: hash-map
@@ -23,3 +31,123 @@ questions:
     prompt: "Given an empty map m, after m['a']=1; m['b']=2; m['a']=3, what does m['a'] return?"
     answer: "3"
     pitfall: "Forgetting that writing an existing key overwrites rather than appends."
+    hints:
+      - "Track what happens when you assign to a key that's already present."
+      - "Writing to an existing key doesn't add a second entry."
+      - "The most recent assignment to that key is what a read returns."
+  - type: mcq
+    id: hash-map-ai-q1
+    conceptId: hash-map
+    difficulty: 1
+    prompt: "What does a hash map's hash function convert a key into?"
+    options: ["A sorted position", "An array index", "A linked list node", "A binary search boundary"]
+    answerIndex: 1
+    pitfall: "Confusing the hash function's role with sorting or binary search mechanisms."
+    hints:
+      - "Think about what the hash function's output actually gets used for."
+      - "It's mentioned right in 'the idea' section — a hash function turns a key into a ____."
+      - "It's a location within the map's underlying array."
+  - type: fill-in
+    id: hash-map-ai-q2
+    conceptId: hash-map
+    difficulty: 1
+    prompt: "Searching an unsorted array for a key costs O(____) in the worst case, which is why hash maps were invented."
+    answer: "n"
+    pitfall: "Thinking unsorted array search is O(log n), confusing it with binary search on sorted data."
+    hints:
+      - "Recall the 'problem it solves' section — what does scanning an unsorted array cost?"
+      - "It's the same complexity class as a full linear scan."
+      - "It's linear in the number of elements — one letter."
+  - type: mcq
+    id: hash-map-ai-q3
+    conceptId: hash-map
+    difficulty: 2
+    prompt: "Which use case best fits a hash map?"
+    options: ["Counting how many times each word appears in a document", "Finding the median of a sorted list", "Reversing an array in place", "Binary searching a sorted array"]
+    answerIndex: 0
+    pitfall: "Picking an option about order or position instead of recognizing a lookup/counting task."
+    hints:
+      - "Look for the option that's about 'have I seen this before' counting."
+      - "The lesson lists frequency counting explicitly as a use case."
+      - "It's the option where you tally occurrences of repeated keys."
+  - type: trace
+    id: hash-map-ai-q4
+    conceptId: hash-map
+    difficulty: 2
+    prompt: "Empty map m. m['x'] = 5; m['y'] = 5. How many keys does m have?"
+    answer: "2"
+    pitfall: "Thinking equal values mean the keys collapse into one entry, confusing value collisions with key collisions."
+    hints:
+      - "Focus on what's being counted — keys or values?"
+      - "Two assignments happened here — think about whether they used the same key or different keys."
+      - "Count how many distinct key names were ever written to, not how many values happen to match."
+  - type: fill-in
+    id: hash-map-ai-q5
+    conceptId: hash-map
+    difficulty: 2
+    prompt: "A hash map used to remove repeated elements from a collection is performing ____."
+    answer: "de-duplication"
+    acceptable: ["deduplication", "dedup", "deduping", "removing duplicates"]
+    pitfall: "Describing it as 'sorting' the collection instead of recognizing it's about tracking uniqueness."
+    hints:
+      - "Think of the second bullet in 'when to reach for it'."
+      - "It's the operation name for keeping only unique values."
+      - "The word starts with 'de-' and ends describing duplicate removal."
+  - type: mcq
+    id: hash-map-ai-q6
+    conceptId: hash-map
+    difficulty: 3
+    prompt: "A hash map has 10 indices, all using chaining, and a poorly chosen hash function makes every one of n keys hash to the exact same index. What is the time complexity of a single lookup in this scenario?"
+    options: ["O(1)", "O(log n)", "O(n)", "O(n^2)"]
+    answerIndex: 2
+    pitfall: "Assuming average-case O(1) still holds here, without recognizing that all keys landing in one chain forces a full scan of that chain."
+    hints:
+      - "Think about what a lookup actually has to do when every key lives in the same bucket."
+      - "With a chain, lookup has to compare against every entry in that bucket, one at a time."
+      - "Count how many keys sit in that single overloaded chain, and think about what searching all of them costs."
+  - type: trace
+    id: hash-map-ai-q7
+    conceptId: hash-map
+    difficulty: 3
+    prompt: "Two keys, 'cat' and 'dog', both hash to index 3 in a chaining-based hash map. Insert 'cat'->1, then 'dog'->2. How many entries live in index 3's chain?"
+    answer: "2"
+    pitfall: "Assuming the second insert overwrites the first because they share an index, confusing index collision with key collision."
+    hints:
+      - "These are two different keys that happen to collide, not the same key twice."
+      - "Chaining handles collisions by keeping a list at that index rather than overwriting."
+      - "Both entries coexist in the same bucket's chain."
+  - type: mcq
+    id: hash-map-ai-q8
+    conceptId: hash-map
+    difficulty: 3
+    prompt: "A hash map resolves a collision by keeping a small linked list of entries at the colliding index, rather than searching for a different empty index elsewhere in the array. What is this collision-resolution strategy called?"
+    options: ["Open addressing", "Linear probing", "Chaining", "Rehashing"]
+    answerIndex: 2
+    pitfall: "Confusing this with 'open addressing', which searches elsewhere in the array instead of using a per-index list."
+    hints:
+      - "Focus on the specific mechanism described — a list attached to one index, versus searching elsewhere."
+      - "The lesson names two strategies; one keeps things local via a list, the other moves on to a different index."
+      - "It's the strategy that does not involve probing to a different index — the one built around each index owning its own small list."
+  - type: mcq
+    id: hash-map-ai-q9
+    conceptId: hash-map
+    difficulty: 4
+    prompt: "A hash map is built on top of an underlying array. When that array hits capacity and must resize, what is the amortized cost of the resize across the hash map's insert operations?"
+    options: ["Still O(1) amortized, since the array's resize cost spreads across many O(1) inserts", "Always O(n) per insert going forward", "O(log n), because resizing requires sorting first", "O(1) worst case, no exceptions ever"]
+    answerIndex: 0
+    pitfall: "Thinking one expensive resize invalidates the average O(1) guarantee entirely, ignoring amortized analysis."
+    hints:
+      - "This connects the array's resizing behavior to the hash map's own average-case complexity claim."
+      - "Think 'amortized' — one expensive operation spread across many cheap ones."
+      - "The resize cost gets divided across all the inserts between resizes, keeping the average at O(1)."
+  - type: trace
+    id: hash-map-ai-q10
+    conceptId: hash-map
+    difficulty: 4
+    prompt: "A hash map is backed by an array of 8 indices using open addressing. Keys hash as follows: 'a'->2, 'b'->2, 'c'->5. Insert order is a, then b, then c. With linear probing (on collision, check the next index), which index does 'b' end up at?"
+    answer: "3"
+    pitfall: "Assuming 'b' fails to insert or overwrites 'a' since they share a hash index."
+    hints:
+      - "'b' collides with 'a' at index 2 — open addressing doesn't give up or overwrite."
+      - "Linear probing checks the next index in sequence until it finds one that's open."
+      - "Start checking right after index 2 — the very next index in order."
