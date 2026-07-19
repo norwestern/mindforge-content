@@ -56,10 +56,11 @@ To bump the pin after an app-repo contract change:
    `contractVersion` in this repo's `pack.json` files as required and cut
    new pack versions.
 
-## Until Phase 5
+## Source of truth
 
-`packs/core` here is a mirror of the app repo's own `packs/core/` — the app
-still bundles that pack directly and doesn't yet consume this registry at
-runtime. Until Phase 5 (the zero-content flip), any edit to the core pack
-lands in the app repo first and gets copied here; don't edit `packs/core`
-in this repo directly, it will be overwritten.
+As of the zero-content flip (D52 Phase 5, 2026-07-18) the app ships bare and
+this repo is the **only** home of the core pack — the app repo's `packs/core/`
+copy is gone. Author and edit all content here directly: edit or add files
+under `packs/<namespace>/`, bump the pack's `version`, and follow the release
+flow above. Fresh app installs get content exclusively by installing packs
+from this registry via the app's `/library` page.
