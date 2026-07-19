@@ -8,6 +8,10 @@ questions:
     options: ["O(n) vs O(n^2)", "O(n) vs O(n)", "O(log n) vs O(n)", "O(n^2) vs O(n^2)"]
     answerIndex: 0
     pitfall: "Reaching for nested loops (O(n^2)) when the array is already sorted."
+    hints:
+      - "Compare how many total comparisons each approach makes across the whole array."
+      - "One approach checks every pair; the other makes one pass with two pointers."
+      - "One of the two complexities is linear, the other is quadratic — match them to the right approach."
   - type: fill-in
     id: two-pointers-q2
     conceptId: two-pointers
@@ -16,6 +20,10 @@ questions:
     answer: "sorted"
     acceptable: ["sorted order"]
     pitfall: "Applying two pointers to unsorted data and getting wrong results."
+    hints:
+      - "Think about what property lets you trust which direction to move a pointer."
+      - "It's the same precondition named in 'the catch' section."
+      - "The word describes the required order of the input, not a data structure."
   - type: trace
     id: two-pointers-q3
     conceptId: two-pointers
@@ -23,3 +31,123 @@ questions:
     prompt: "Sorted array [1,3,4,6,8], target sum 10. Pointers start at index 0 (value 1) and index 4 (value 8): sum 9, too low, left moves to index 1 (value 3). Sum 3+8=11, too high, right moves to index 3 (value 6). Sum 3+6=9, too low, left moves to index 2 (value 4). What is the sum at left=2, right=3?"
     answer: "10"
     pitfall: "Moving the wrong pointer when the sum is too high vs too low."
+    hints:
+      - "Just add the two values now pointed to."
+      - "left=2 points to value 4, right=3 points to value 6 in the array [1,3,4,6,8]."
+      - "Add those two specific values together."
+  - type: mcq
+    id: two-pointers-ai-q1
+    conceptId: two-pointers
+    difficulty: 1
+    prompt: "In the classic two-pointer pair-sum setup on a sorted array, where do the two pointers start?"
+    options: ["Both at index 0", "One at index 0, one at the last index", "Both at the last index", "One at the middle, one at index 0"]
+    answerIndex: 1
+    pitfall: "Starting both pointers at the same end, which can never converge inward."
+    hints:
+      - "Think about which direction each pointer needs room to move."
+      - "The technique scans 'from both ends inward' — that phrase tells you the starting positions."
+      - "One pointer needs to move right, the other left, so they don't start at the same spot."
+  - type: fill-in
+    id: two-pointers-ai-q2
+    conceptId: two-pointers
+    difficulty: 1
+    prompt: "If the current pair's sum is too high, the only way to decrease it is moving the ____ pointer."
+    answer: "high"
+    pitfall: "Moving the low pointer instead, which would only increase the sum further, not decrease it."
+    hints:
+      - "Think about which single move can only shrink the sum, never grow it."
+      - "The lesson names two roles for the pointers: one causes sums to go up, the other causes them to go down."
+      - "It's the pointer whose movement direction is described as coming 'down'."
+  - type: mcq
+    id: two-pointers-ai-q3
+    conceptId: two-pointers
+    difficulty: 2
+    prompt: "Sorted array [2,4,6,8,10], target sum 12. Pointers at index 0 (2) and index 4 (10): sum=12. What should happen next?"
+    options: ["Both pointers found the target — done", "Sum too high, move the right pointer left", "Sum too low, move the left pointer right", "Restart from the middle"]
+    answerIndex: 0
+    pitfall: "Continuing to move pointers even after already finding the exact target sum."
+    hints:
+      - "Check the sum against the target before deciding to move anything."
+      - "There are three possible outcomes each step: too high, too low, or an exact match — each leads to a different action."
+      - "This step's sum isn't too high or too low compared to the target — what's the third possible outcome, and what does it mean for the pointers?"
+  - type: trace
+    id: two-pointers-ai-q4
+    conceptId: two-pointers
+    difficulty: 2
+    prompt: "Sorted array [1,2,4,7,9], target sum 8. Start left=0 (1), right=4 (9): sum=10, too high, right moves to index 3 (7). Sum=1+7=8. What two values were found?"
+    answer: "1 and 7"
+    pitfall: "Stopping at the first pointer move without checking the new sum against the target."
+    hints:
+      - "Don't stop moving pointers until the sum matches exactly."
+      - "Recompute the sum every time a pointer moves before deciding again."
+      - "The second sum you compute already equals the target — check what values produced it."
+  - type: mcq
+    id: two-pointers-ai-q5
+    conceptId: two-pointers
+    difficulty: 2
+    prompt: "You run the standard two-pointer algorithm (move the high pointer down on too-high sum, the low pointer up on too-low sum) on the UNSORTED array [5, 1, 6, 3], looking for a pair summing to 4. Start at index 0 (5) and index 3 (3): sum=8, too high, high pointer moves to index 2 (6). Sum=5+6=11, too high, high pointer moves to index 1 (1). Sum=5+1=6, still too high, high pointer moves to index 0 — now the pointers have met, so the algorithm stops and reports no pair found. But index 1 (value 1) and index 3 (value 3) actually sum to 4. What does this demonstrate?"
+    options: ["Two pointers still finds every valid pair on unsorted data, just slower", "Two pointers can silently skip a valid pair when the input isn't actually sorted", "The algorithm throws an error because the input isn't sorted", "Unsorted data only affects trace questions, not real use"]
+    answerIndex: 1
+    pitfall: "Assuming the algorithm errors out or still works correctly (just slower) on unsorted data, rather than recognizing it can silently miss a valid pair and report none found."
+    hints:
+      - "Walk through what pointers actually get compared, and check whether the real answer's two indices ever appear together in a single comparison."
+      - "Think about whether an unsorted array's pointer movements still logically guarantee every valid pair gets checked."
+      - "Notice that indices 1 and 3 — the actual answer — never end up being compared to each other before the pointers meet."
+  - type: mcq
+    id: two-pointers-ai-q6
+    conceptId: two-pointers
+    difficulty: 3
+    prompt: "Merging sorted arrays A=[5,9] and B=[1,3,7] with two pointers (write whichever current value is smaller, then advance only that one pointer): after writing the first two values to the output, what is the third value written?"
+    options: ["3", "5", "7", "9"]
+    answerIndex: 1
+    pitfall: "Assuming values are always taken alternately from each array in turn, rather than by comparing current values at each step."
+    hints:
+      - "Track both pointers' positions after each write — don't assume turns alternate between arrays."
+      - "After the first two writes, re-compare whatever's now at each pointer's current position."
+      - "By the third write, one array's pointer has moved further ahead than the other — compare their current values now."
+  - type: trace
+    id: two-pointers-ai-q7
+    conceptId: two-pointers
+    difficulty: 3
+    prompt: "Sorted array [1,1,2,2,3]. Removing duplicates in place with two pointers (one tracks the last unique value's position, the other scans forward), how many unique values remain?"
+    answer: "3"
+    pitfall: "Counting total elements scanned rather than distinct values kept."
+    hints:
+      - "Focus on distinct values in the array, not the array's original length."
+      - "Walk through the array left to right, and only count a value the first time it appears."
+      - "List out this specific array's runs of repeated values — how many separate value-groups does [1,1,2,2,3] split into?"
+  - type: mcq
+    id: two-pointers-ai-q8
+    conceptId: two-pointers
+    difficulty: 4
+    prompt: "An array of 1,000 elements was just built via pushes with automatic resizing along the way (each resize costs O(n) to copy elements into a bigger block), and now needs a pair-sum answer via two pointers — but the array isn't sorted yet. Counting the total cost of the resizing already paid during construction (O(n)), plus sorting (O(n log n)), plus the two-pointer sweep (O(n)), how does this whole pipeline compare to just checking all pairs directly, in Big-O terms?"
+    options: ["The combined pipeline (dominated by O(n log n)) is still asymptotically cheaper than checking all pairs (O(n^2))", "They are the same complexity class", "Checking all pairs is cheaper since it skips the resizing and sorting steps", "The combined pipeline is always slower because of the extra resizing and sorting steps"]
+    answerIndex: 0
+    pitfall: "Assuming that stacking three separate steps (resize, sort, sweep) must be worse than one 'simple' nested loop, rather than recognizing O(n log n) still beats O(n^2) asymptotically even after adding the resize's O(n) cost."
+    hints:
+      - "Add up all three steps' costs, then compare the dominant term against the brute-force alternative."
+      - "O(n) + O(n log n) + O(n) simplifies to whichever term grows fastest — figure out which one that is."
+      - "n log n grows faster than n, but still far slower than n^2 for large n — which side of that trade wins?"
+  - type: mcq
+    id: two-pointers-ai-q9
+    conceptId: two-pointers
+    difficulty: 4
+    prompt: "An array just finished a resize (capacity doubled, all n elements copied into the new block, an O(n) cost), and the array is confirmed sorted. Running a two-pointer pair-sum search on it next costs O(n) for the search itself. What is the combined cost of the resize followed by the search?"
+    options: ["O(n), since two sequential O(n) steps add together", "O(n^2), since multiplying the two O(n) costs together", "O(log n), since the sorted, resized array is now binary-searchable", "O(1), since only the search step counts toward the total"]
+    answerIndex: 0
+    pitfall: "Multiplying the two O(n) costs together instead of adding them, as if the steps compound multiplicatively rather than running one after another."
+    hints:
+      - "Think about whether these two steps happen one after another, or nested inside each other."
+      - "Two sequential costs add together; multiplying only happens when one step is nested inside the other's loop."
+      - "Add the two costs together first, then simplify — don't multiply them."
+  - type: trace
+    id: two-pointers-ai-q10
+    conceptId: two-pointers
+    difficulty: 3
+    prompt: "Merging two sorted arrays A=[2, 5, 8] and B=[5, 9] with two pointers, writing whichever current value is smaller and advancing only that one pointer (on a tie, write one value and advance just that side's pointer): what is the full merged sequence?"
+    answer: "2, 5, 5, 8, 9"
+    pitfall: "Assuming a tie should advance both pointers and write the value only once overall, which would silently drop one of the two equal values from the output."
+    hints:
+      - "Walk through the merge one comparison at a time — don't treat the result as already known."
+      - "On a tie, only one pointer advances per step; the other one's equal value still needs its own turn on a later comparison."
+      - "After the tie is written once and one pointer moves, check whether the other array's equal value still gets compared and written on the next step."

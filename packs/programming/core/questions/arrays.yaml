@@ -8,6 +8,10 @@ questions:
     options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
     answerIndex: 0
     pitfall: "Thinking indexed access requires scanning, like a linked list."
+    hints:
+      - "Think about whether you need to look through other elements to reach one by index."
+      - "It's the address-arithmetic property from the lesson — direct computation, not search."
+      - "The complexity class where the operation takes the same constant time regardless of array size."
   - type: fill-in
     id: arrays-q2
     conceptId: arrays
@@ -16,6 +20,10 @@ questions:
     answer: "n"
     acceptable: ["n elements"]
     pitfall: "Forgetting that insertion at the front is O(n), not O(1)."
+    hints:
+      - "Think about every existing element's relationship to the new front slot."
+      - "Front insertion is the shifting case described in 'the catch'."
+      - "Count how many elements sit after the front position, in the worst case."
   - type: trace
     id: arrays-q3
     conceptId: arrays
@@ -23,3 +31,123 @@ questions:
     prompt: "Given an empty array, push 5, then 8, then 3. What is arr[2]?"
     answer: "3"
     pitfall: "Confusing insertion order with sorted order — arrays don't auto-sort."
+    hints:
+      - "Track what push does — where does each new value land?"
+      - "Each push appends at the next open index; order of insertion is the index order here."
+      - "arr[2] is whichever value was pushed third."
+  - type: mcq
+    id: arrays-ai-q1
+    conceptId: arrays
+    difficulty: 1
+    prompt: "What is the time complexity of appending an element to the end of an array when there's spare capacity?"
+    options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"]
+    answerIndex: 0
+    pitfall: "Thinking all array insertions are O(n) regardless of position."
+    hints:
+      - "Think about whether this specific position needs anything shifted."
+      - "Only insertions that displace existing elements cost more than O(1)."
+      - "If there's already room at the end, no elements move at all."
+  - type: fill-in
+    id: arrays-ai-q2
+    conceptId: arrays
+    difficulty: 1
+    prompt: "Arrays store elements of the same ____ so each one occupies the same fixed size in memory."
+    answer: "type"
+    acceptable: ["data type"]
+    pitfall: "Thinking of arrays as just 'ordered lists' without connecting same-size elements to index arithmetic."
+    hints:
+      - "What has to be true about every element for base + i * size to work?"
+      - "It's about a shared property of the elements' size in memory."
+      - "The word describes what category of value each element holds."
+  - type: mcq
+    id: arrays-ai-q3
+    conceptId: arrays
+    difficulty: 2
+    prompt: "An array's elements are each 4 bytes wide, and the array's base address is 1000. What is the address of the element at index 5?"
+    options: ["1004", "1005", "1020", "1024"]
+    answerIndex: 2
+    pitfall: "Forgetting to multiply by element size and just adding the index to the base address."
+    hints:
+      - "Recall the address formula from the lesson."
+      - "It's base + index × element size, not base + index."
+      - "Multiply 5 by 4 first, then add the result to 1000."
+  - type: trace
+    id: arrays-ai-q4
+    conceptId: arrays
+    difficulty: 2
+    prompt: "Array [10, 20, 30, 40, 50]. Remove the element at index 1 (value 20), shifting later elements left. What is arr[1] after the removal?"
+    answer: "30"
+    pitfall: "Thinking removal leaves a gap rather than shifting later elements down."
+    hints:
+      - "Removing from the middle isn't just deleting a slot."
+      - "The catch mentions removal shifts everything after it left by one."
+      - "Whatever value was at index 2 slides down to fill index 1."
+  - type: fill-in
+    id: arrays-ai-q5
+    conceptId: arrays
+    difficulty: 2
+    prompt: "An array holds 4 elements and is at full capacity 4. Pushing one more element triggers a resize to capacity 8. How many elements get copied from the old block into the new one during that resize?"
+    answer: "4"
+    pitfall: "Assuming the resize copies the new capacity's worth of slots (8) rather than just the existing elements."
+    hints:
+      - "Think about what actually needs to move — the empty slots or the ones already holding data?"
+      - "Resizing copies every existing element into the new block; it doesn't touch to-be-empty slots."
+      - "Count how many elements were actually in the array before the resize happened."
+  - type: mcq
+    id: arrays-ai-q6
+    conceptId: arrays
+    difficulty: 3
+    prompt: "Which pair of operations are BOTH O(1) on an array (neither requires shifting any other elements)?"
+    options: ["Insert at the front, and remove the last element", "Append at the end (with spare capacity), and remove the last element", "Insert at the front, and remove the first element", "Insert in the middle, and append at the end"]
+    answerIndex: 1
+    pitfall: "Assuming any operation involving the 'front' or 'back' of the array behaves symmetrically, rather than recognizing only tail operations avoid shifting."
+    hints:
+      - "Check each of the two operations in every option separately before deciding if the whole pair qualifies."
+      - "Only operations that touch the very end of the array avoid shifting; anything touching the front or middle requires it."
+      - "Find the one option where neither operation touches the front or the middle."
+  - type: trace
+    id: arrays-ai-q7
+    conceptId: arrays
+    difficulty: 3
+    prompt: "Array [1, 2, 3, 4, 5] is full at capacity 5. Push 6. The array's capacity doubles and all elements are copied into the new block before the push completes. What is arr[5] after the push?"
+    answer: "6"
+    pitfall: "Assuming a full array silently drops the new element instead of resizing first."
+    hints:
+      - "The array is full — what does 'the catch' section say happens next?"
+      - "A bigger block gets allocated and everything gets copied before the new value lands."
+      - "The pushed value ends up right after the last old element."
+  - type: fill-in
+    id: arrays-ai-q8
+    conceptId: arrays
+    difficulty: 3
+    prompt: "Inserting n elements one at a time at the front of an array (each shift moving everything after it) costs O(____) overall."
+    answer: "n^2"
+    acceptable: ["n^2", "n²", "O(n^2)"]
+    pitfall: "Adding the per-insert costs linearly instead of recognizing the repeated O(n) shifts compound."
+    hints:
+      - "Each single insert costs O(n) — now do that n times."
+      - "Sum n operations that each individually cost O(n)."
+      - "n insertions × O(n) each multiplies out to n squared."
+  - type: mcq
+    id: arrays-ai-q9
+    conceptId: arrays
+    difficulty: 4
+    prompt: "An array has capacity 4, holds [7, 14, 21, 28] (full), base address 1000, and each element is 4 bytes wide. One more push triggers a resize that doubles capacity and copies all elements into a new block based at address 2000, before the push completes. What is the address of the element at index 2 immediately after the resize (before the push writes anything new)?"
+    options: ["1008", "1016", "2008", "2016"]
+    answerIndex: 2
+    pitfall: "Using the old base address (1000) instead of the new block's base address (2000) after the resize, forgetting the whole block relocated."
+    hints:
+      - "Two things happened here: the array's contents kept their order, but something about their memory location changed."
+      - "After a resize, the whole block moves to a new base address — use the new one, not the old one, for address arithmetic."
+      - "Apply the same base + index × size formula, but plug in 2000 as the base, not 1000."
+  - type: trace
+    id: arrays-ai-q10
+    conceptId: arrays
+    difficulty: 4
+    prompt: "Array capacity 4, contains [5, 10, 15, 20] (full). Insert 99 at index 1. The array first resizes (capacity doubles, elements copied), then elements from index 1 onward shift right by one, then 99 is placed at index 1. What is the final array?"
+    answer: "[5, 99, 10, 15, 20]"
+    pitfall: "Forgetting the resize happens before the shift-and-insert, or shifting in the wrong direction."
+    hints:
+      - "Two things need to happen before 99 lands in place — resizing is one of them."
+      - "First the whole array is copied into a bigger block, then the insert works like a normal shift-and-insert into that bigger block."
+      - "After resizing, everything from index 1 onward slides right by one before 99 fills index 1."
