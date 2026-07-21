@@ -1,0 +1,102 @@
+# .github/workflows/release.yml (in norwestern/mindforge-content)
+name: Release Build
+
+on:
+  repository_dispatch:
+    types: [build-release]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'mindforge tag to build (e.g. v0.1.0)'
+        required: true
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - macos-latest      # macOS arm64 -> dmg + app.tar.gz
+          - windows-latest    # win x64     -> NSIS .exe
+          - ubuntu-latest     # linux x64   -> AppImage
+          - ubuntu-24.04-arm  # linux arm64 -> AppImage
+    runs-on: ${{ matrix.runner }}
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.client_payload.tag }}
+      VITE_APP_MODE: portable
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: norwestern/mindforge
+          ref: ${{ env.RELEASE_TAG }}
+          token: ${{ secrets.MINDFORGE_APP_READ_TOKEN }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux dependencies
+        if: startsWith(matrix.runner, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm run prepare:sidecar
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # Ad-hoc codesign the macOS bundle (no Apple Developer account).
+          # Makes the arm64 .app run without the "damaged" Gatekeeper block;
+          # users still click "Open Anyway" once on first launch.
+          APPLE_SIGNING_IDENTITY: '-'
+        with:
+          tauriScript: npx tauri
+          tagName: ${{ env.RELEASE_TAG }}
+          releaseName: 'Mindforge ${{ env.RELEASE_TAG }}'
+          releaseDraft: true
+          uploadUpdaterJson: true
+          releaseBody: |
+            Ad-hoc signed (not notarized) — first-launch notes:
+            - macOS: right-click the app → "Open" → "Open" in the dialog. Or System Settings → Privacy & Security → "Open Anyway".
+            - Windows: SmartScreen → "More info" → "Run anyway".
+
+            Verify downloads (optional): compare against `SHA256SUMS.txt` attached to this release.
+            - macOS/Linux: `shasum -a 256 -c SHA256SUMS.txt`
+            - Windows (PowerShell): `(Get-FileHash <file> -Algorithm SHA256).Hash`
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.client_payload.tag }}
+    steps:
+      - name: Generate SHA256 checksums
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p artifacts
+          # Pull every release asset (installers, updater .sig, latest.json).
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir artifacts
+          cd artifacts
+          # Checksum everything except a prior sums file, if re-running.
+          rm -f SHA256SUMS.txt
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          gh release upload "$RELEASE_TAG" SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --clobber
+
+      - name: Publish release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false
